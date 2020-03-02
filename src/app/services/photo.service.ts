@@ -126,7 +126,7 @@ for (let photo of this.photos) {
       path: photo.filepath,
       directory: FilesystemDirectory.Data
   });
-
+  //teste
   // Web platform only: Save the photo into the base64 field
   photo.base64 = `data:image/jpeg;base64,${readFile.data}`;
     }
