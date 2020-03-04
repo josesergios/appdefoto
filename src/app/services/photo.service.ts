@@ -18,6 +18,34 @@ export class PhotoService {
     this.platform = platform;
   }
 
+  public async loadSaved() {
+    // Retrieve cached photo array data
+    const photos = await Storage.get({ key: 
+  
+    this.PHOTO_STORAGE });
+    this.
+  
+    photos = JSON.parse(photos.value) || [];
+  
+    // more to come...
+    if(!this.platform.is('hybrid')){
+
+      for (let photo of this.photos) {
+        // Read each saved photo's data from the Filesystem
+        const readFile = await Filesystem.readFile({
+            path: photo.filepath,
+            directory: FilesystemDirectory.Data
+        });
+        photo.base64 = `data:image/jpeg;base64,${readFile.data}`;  
+    }
+      // Display the photo by reading into base64 format
+    
+      //teste
+      // Web platform only: Save the photo into the base64 field
+     
+        }
+  }
+
   public async addNewToGallery() {
     // Take a photo
     const capturedPhoto = await Camera.getPhoto({
@@ -34,6 +62,17 @@ export class PhotoService {
     // Save the picture and add it to photo collection
     const savedImageFile = await this.savePicture(capturedPhoto);
     this.photos.unshift(savedImageFile);
+
+    Storage.set({
+      key: this.PHOTO_STORAGE,
+      value: this.platform.is('hybrid')
+              ? JSON.stringify(this.photos)
+              : JSON.stringify(this.photos.map(p => {
+              const photoCopy = { ...p };
+              delete photoCopy.base64;
+              return photoCopy;
+              }))
+    });
 
   }
 
@@ -108,42 +147,7 @@ export class PhotoService {
     reader.readAsDataURL(blob);
   });
 
-  public async loadSaved() {
-    // Retrieve cached photo array data
-    const photos = await Storage.get({ key: 
-  
-    this.PHOTO_STORAGE });
-    this.
-  
-    photos = JSON.parse(photos.value) || [];
-  
-    // more to come...
-
-    // Display the photo by reading into base64 format
-for (let photo of this.photos) {
-  // Read each saved photo's data from the Filesystem
-  const readFile = await Filesystem.readFile({
-      path: photo.filepath,
-      directory: FilesystemDirectory.Data
-  });
-  //teste
-  // Web platform only: Save the photo into the base64 field
-  photo.base64 = `data:image/jpeg;base64,${readFile.data}`;
-    }
-  }
-
 }
-
-Storage.set({
-  key: this.PHOTO_STORAGE,
-  value: this.platform.is('hybrid')
-          ? JSON.stringify(this.photos)
-          : JSON.stringify(this.photos.map(p => {
-          const photoCopy = { ...p };
-          delete photoCopy.base64;
-          return photoCopy;
-          }))
-});
 
 interface Photo {
   filepath: string;
