@@ -29,7 +29,6 @@ export class PhotoService {
   
     // more to come...
     if(!this.platform.is('hybrid')){
-
       for (let photo of this.photos) {
         // Read each saved photo's data from the Filesystem
         const readFile = await Filesystem.readFile({
